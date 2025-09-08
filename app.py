@@ -73,7 +73,7 @@ if st.button("Générer la courbe"):
     y_pred = model.predict(X)
     fig, ax = plt.subplots()
     ax.plot(np.log10(gammas), y_pred, label="G/Gmax", color="blue")
-    ax.set_xscale('log')
+    #ax.set_xscale('log')
     ax.set_xlabel("γ (%)")
     ax.set_ylabel("G/Gmax")
     ax.grid(True)
