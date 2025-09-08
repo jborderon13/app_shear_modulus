@@ -23,14 +23,12 @@ with col1:
      Wl = st.number_input("Wl", value=20.0, key="Wl")
 
 with col2:
-    rho = st.number_input("ρ (t/m3)", value=1.5, key="rho")
-    sigma = st.number_input("σ (kpa)", value=200.0, key="sigma")
-    Z = st.number_input("Z (m)", value=20.0, key="Z")
+     Z = st.number_input("Z (m)", value=20.0, key="Z")
+    sigma = st.number_input("σ (kpa)", value=200.0, key="sigma")  
 
 with col3:
     e0 = st.number_input("e0", value=0.5, key="e0")
-    gamma_min = st.number_input("γ min (%)", value=0.01, key="gamma_min")
-    gamma_max = st.number_input("γ max (%)", value=1.0, key="gamma_max")
+    rho = st.number_input("ρ (t/m3)", value=1.5, key="rho")
 
 
 
