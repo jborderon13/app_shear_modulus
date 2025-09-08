@@ -25,7 +25,6 @@ with col1:
 with col2:
     rho = st.number_input("ρ (t/m3)", value=1.5, key="rho")
     sigma = st.number_input("σ (kpa)", value=200.0, key="sigma")
-    n_points = st.slider("Nombre de points", min_value=10, max_value=200, value=50)
     Z = st.number_input("Z (m)", value=20.0, key="Z")
 
 with col3:
@@ -36,6 +35,7 @@ with col3:
 
 
 # Ajouter les paramètres restants (ρ et σ) en dessous
+n_points = st.slider("Nombre de points", min_value=10, max_value=200, value=50)
 
 # =============================================
 # Logique pour la classe USCS (une seule case cochée)
