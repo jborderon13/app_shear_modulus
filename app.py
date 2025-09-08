@@ -23,7 +23,7 @@ with col1:
      Wl = st.number_input("Wl", value=20.0, key="Wl")
 
 with col2:
-     Z = st.number_input("Z (m)", value=20.0, key="Z")
+    Z = st.number_input("Z (m)", value=20.0, key="Z")
     sigma = st.number_input("σ (kpa)", value=200.0, key="sigma")  
 
 with col3:
