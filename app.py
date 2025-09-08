@@ -35,7 +35,7 @@ with col3:
 
 
 # Ajouter les paramètres restants (ρ et σ) en dessous
-n_points = st.slider("Nombre de points", min_value=10, max_value=200, value=50)
+n_points = st.slider("Nombre de points", min_value=5, max_value=20, value=15)
 
 # =============================================
 # Logique pour la classe USCS (une seule case cochée)
