@@ -288,34 +288,5 @@ if st.button("Générer la courbe"):
             st.write(f"USCS = {selected_uscs}")
             st.write(f"K₀ = {K0}")
     
-    # Statistiques comparatives
-    if any(empirical_equations.values()) or show_model:
-        st.subheader("Comparaison des valeurs finales (γ = 10⁻¹ %)")
-        final_values = {}
         
-        if show_model:
-            final_values["Modèle ML"] = f"{y_pred[-1]:.3f}"
-        
-        for eq_name, is_selected in empirical_equations.items():
-            if is_selected:
-                try:
-                    if eq_name == "Kollioglou":
-                        final_val = kollioglou_GGmax(PI, gamma_log[-1])
-                    elif eq_name == "Ishibashi":
-                        final_val = G_over_Gmax_ishibachi(gamma_log[-1], PI, sigma)
-                    elif eq_name == "Vardanega":
-                        final_val = vardanega_GGmax(PI, gamma_log[-1])
-                    elif eq_name == "Ciancimino":
-                        final_val = G_over_Gmax_ciancimino(gamma_log[-1], PI, sigma)
-                    elif eq_name == "Zhang":
-                        final_val = G_over_Gmax_zhang(gamma_log[-1], PI, sigma, K0)
-                    
-                    final_values[eq_name] = f"{np.clip(final_val, 0, 1):.3f}"
-                except:
-                    final_values[eq_name] = "Erreur"
-        
-        # Afficher les valeurs finales en colonnes
-        cols = st.columns(len(final_values))
-        for i, (name, value) in enumerate(final_values.items()):
-            with cols[i]:
-                st.metric(f"G/Gmax ({name})", value)
+
