@@ -57,7 +57,7 @@ USCS_ML_OL = 1 if selected_uscs == "ML-OL" else 0
 # Calcul et tracé
 # =============================================
 if st.button("Générer la courbe"):
-    gammas = np.logspace(-8, -1, n_points)
+    gammas = np.logspace(-6, -1, n_points)
     X = []
     for g in gammas:
         features = [
