@@ -163,12 +163,25 @@ with col_opt2:
     show_model = st.checkbox("Afficher le modèle ML", value=True)
 
 st.subheader("Équations empiriques à comparer")
+col_eq1, col_eq2, col_eq3, col_eq4, col_eq5 = st.columns(5)
+
+with col_eq1:
+    kollioglou_checked = st.checkbox("Kollioglou", value=False)
+with col_eq2:
+    ishibashi_checked = st.checkbox("Ishibashi", value=False)
+with col_eq3:
+    vardanega_checked = st.checkbox("Vardanega", value=False)
+with col_eq4:
+    ciancimino_checked = st.checkbox("Ciancimino", value=False)
+with col_eq5:
+    zhang_checked = st.checkbox("Zhang", value=False)
+
 empirical_equations = {
-    "Kollioglou": st.checkbox("Kollioglou", value=False),
-    "Ishibashi": st.checkbox("Ishibashi", value=False),
-    "Vardanega": st.checkbox("Vardanega", value=False),
-    "Ciancimino": st.checkbox("Ciancimino", value=False),
-    "Zhang": st.checkbox("Zhang", value=False)
+    "Kollioglou": kollioglou_checked,
+    "Ishibashi": ishibashi_checked,
+    "Vardanega": vardanega_checked,
+    "Ciancimino": ciancimino_checked,
+    "Zhang": zhang_checked
 }
 
 # =============================================
