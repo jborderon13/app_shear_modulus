@@ -116,7 +116,6 @@ col1, col2, col3 = st.columns(3)
 with col1:
      PI = st.number_input("PI", value=20.0, key="PI")
      W = st.number_input("W", value=20.0, key="W")
-     Wl = st.number_input("Wl", value=20.0, key="Wl")
 
 with col2:
     Z = st.number_input("Z (m)", value=20.0, key="Z")
@@ -125,8 +124,11 @@ with col2:
 with col3:
     e0 = st.number_input("e0", value=0.5, key="e0")
     rho = st.number_input("ρ (t/m3)", value=1.5, key="rho")
+    
+with col4:     
+    Wl = st.number_input("Wl", value=20.0, key="Wl")
     K0 = st.number_input("K₀ (pour Zhang)", value=0.5, key="K0")
-  
+
 
 # Ajouter les paramètres restants
 n_points = st.slider("Nombre de points", min_value=5, max_value=20, value=15)
