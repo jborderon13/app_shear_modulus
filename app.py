@@ -111,7 +111,7 @@ def get_uncertainty_bounds(g_gmax_values):
 # Paramètres d'entrée dans l'ordre strict du modèle
 # =============================================
 # Créer des colonnes pour un affichage horizontal
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3 = st.columns(3)
 
 with col1:
      PI = st.number_input("PI", value=20.0, key="PI")
@@ -125,10 +125,8 @@ with col2:
 with col3:
     e0 = st.number_input("e0", value=0.5, key="e0")
     rho = st.number_input("ρ (t/m3)", value=1.5, key="rho")
-
-with col4:
-    # Paramètres additionnels pour certaines équations empiriques
     K0 = st.number_input("K₀ (pour Zhang)", value=0.5, key="K0")
+  
 
 # Ajouter les paramètres restants
 n_points = st.slider("Nombre de points", min_value=5, max_value=20, value=15)
