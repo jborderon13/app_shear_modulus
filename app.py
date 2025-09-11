@@ -111,7 +111,7 @@ def get_uncertainty_bounds(g_gmax_values):
 # Paramètres d'entrée dans l'ordre strict du modèle
 # =============================================
 # Créer des colonnes pour un affichage horizontal
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
      PI = st.number_input("PI", value=20.0, key="PI")
