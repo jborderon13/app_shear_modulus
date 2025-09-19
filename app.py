@@ -3,6 +3,8 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 
+# Charger le logo
+st.image("logo.jpg", width=150)  # Ajustez la largeur selon vos besoins
 # Charger le modèle
 with open("model.pkl", "rb") as f:
     model = joblib.load(f)
