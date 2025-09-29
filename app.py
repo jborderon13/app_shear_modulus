@@ -189,4 +189,3 @@ if st.button("Generate curve"):
         st.write(f"PI = {PI}, W = {W}, Wl = {Wl}")
         st.write(f"Z = {Z} m, σ = {sigma} kPa, e₀ = {e0}")
         st.write(f"ρ = {rho} t/m³, USCS = {selected_uscs}, K₀ = {K0}")
-```
