@@ -172,11 +172,11 @@ if st.button("Generate curve"):
             color_idx += 1
 
     ax.set_ylim(0, 1)
-    ax.set_xlabel("log₁₀(γ) [γ in %]")
-    ax.set_ylabel("G/Gmax")
-    ax.set_title("Comparison of shear modulus degradation curves")
+    ax.set_xlabel("log₁₀(γ) [γ in %]", fontsize=16)
+    ax.set_ylabel("G/Gmax", fontsize=16)
+    ax.set_title("Comparison of shear modulus degradation curves", fontsize=18)
     ax.grid(True, alpha=0.3)
-    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', prop={'size': 14})
     plt.tight_layout()
     st.pyplot(fig)
 
