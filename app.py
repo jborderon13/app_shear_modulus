@@ -12,19 +12,22 @@ with open("model.pkl", "rb") as f:
     model = joblib.load(f)
 
 st.title("📈 G/Gmax curve as a function of γ (%)")
-st.markdown("Enter your soil parameters to generate the G/Gmax curve with uncertainties and empirical equations.")
+st.markdown(
+    "Enter your soil parameters to generate the G/Gmax curve with uncertainties and empirical equations. "
+    "If a parameter has not been measured, check the corresponding **Not measured** box: "
+    "the XGBoost model handles missing inputs natively, while empirical equations requiring "
+    "that parameter will be automatically disabled."
+)
 
 # =============================================
-# Empirical equations
+# Empirical equations (unchanged)
 # =============================================
 def kollioglou_GGmax(PI, gamma):
     a, b, c, d = 0.99418785, -2.1598671, 10.039495, -16.863967
     e, f, g, h = 0.062926143, -0.013688113, -0.02900694, 5.9454009
-
     term1 = b * (0.5 + np.arctan((PI - c) / d) / np.pi)
     term2 = e * (0.5 + np.arctan((10**(gamma) - f) / g) / np.pi)
     term3 = h * (0.5 + np.arctan((PI - c) / d) / np.pi) * (0.5 + np.arctan((10**(gamma) - f) / g) / np.pi)
-
     return a + term1 + term2 + term3
 
 def G_over_Gmax_ishibachi(gamma, PI, sigma):
@@ -59,7 +62,7 @@ def G_over_Gmax_zhang(gamma, PI, sigma_kpa, K0):
     return 1 / (1 + (10**(gamma) / gamma_r) ** alpha)
 
 # =============================================
-# Uncertainty bands
+# Uncertainty bands (unchanged)
 # =============================================
 def get_uncertainty_bounds(g_gmax_values):
     lower_bounds, upper_bounds = [], []
@@ -73,31 +76,71 @@ def get_uncertainty_bounds(g_gmax_values):
     return np.array(lower_bounds), np.array(upper_bounds)
 
 # =============================================
+# Helper: input with "Not measured" checkbox
+# =============================================
+def input_with_missing(label, default_value, key):
+    """
+    Returns the value as float, or np.nan if 'Not measured' is checked.
+    """
+    val = st.number_input(label, value=default_value, key=f"{key}_val")
+    missing = st.checkbox("Not measured", value=False, key=f"{key}_missing")
+    return np.nan if missing else val
+
+# =============================================
 # Input parameters
 # =============================================
+st.subheader("Soil parameters")
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    PI = st.number_input("PI", value=20.0)
-    W = st.number_input("W", value=20.0)
+    PI = input_with_missing("PI", 20.0, "PI")
+    W = input_with_missing("W", 20.0, "W")
 with col2:
-    Z = st.number_input("Z (m)", value=20.0)
-    sigma = st.number_input("σ (kPa)", value=200.0)
+    Z = input_with_missing("Z (m)", 20.0, "Z")
+    sigma = input_with_missing("σ (kPa)", 200.0, "sigma")
 with col3:
-    e0 = st.number_input("e₀", value=0.5)
-    rho = st.number_input("ρ (t/m³)", value=1.5)
+    e0 = input_with_missing("e₀", 0.5, "e0")
+    rho = input_with_missing("ρ (t/m³)", 1.5, "rho")
 with col4:
-    Wl = st.number_input("Wl", value=20.0)
-    K0 = st.number_input("K₀ (for Zhang)", value=0.5)
+    Wl = input_with_missing("Wl", 20.0, "Wl")
+    K0 = input_with_missing("K₀ (for Zhang)", 0.5, "K0")
 
 n_points = st.slider("Number of points", min_value=5, max_value=20, value=15)
 
-uscs_options = ["CH", "CH-CL", "CL", "CL-CH", "CL-ML", "MH", "MH-OH", "ML", "ML-OL"]
+uscs_options = ["CH", "CH-CL", "CL", "CL-CH", "CL-ML", "MH", "MH-OH", "ML", "ML-OL", "Not measured"]
 selected_uscs = st.radio("Select USCS class:", uscs_options, horizontal=True)
 
-# One-hot encoding
-USCS_CH, USCS_CH_CL, USCS_CL = int(selected_uscs=="CH"), int(selected_uscs=="CH-CL"), int(selected_uscs=="CL")
-USCS_CL_CH, USCS_CL_ML, USCS_MH = int(selected_uscs=="CL-CH"), int(selected_uscs=="CL-ML"), int(selected_uscs=="MH")
-USCS_MH_OH, USCS_ML, USCS_ML_OL = int(selected_uscs=="MH-OH"), int(selected_uscs=="ML"), int(selected_uscs=="ML-OL")
+# One-hot encoding (all zeros if "Not measured" is selected)
+uscs_missing = (selected_uscs == "Not measured")
+USCS_CH    = int(selected_uscs == "CH")
+USCS_CH_CL = int(selected_uscs == "CH-CL")
+USCS_CL    = int(selected_uscs == "CL")
+USCS_CL_CH = int(selected_uscs == "CL-CH")
+USCS_CL_ML = int(selected_uscs == "CL-ML")
+USCS_MH    = int(selected_uscs == "MH")
+USCS_MH_OH = int(selected_uscs == "MH-OH")
+USCS_ML    = int(selected_uscs == "ML")
+USCS_ML_OL = int(selected_uscs == "ML-OL")
+
+# =============================================
+# Summary of missing inputs
+# =============================================
+missing_params = []
+if np.isnan(PI):    missing_params.append("PI")
+if np.isnan(W):     missing_params.append("W")
+if np.isnan(Wl):    missing_params.append("Wl")
+if np.isnan(Z):     missing_params.append("Z")
+if np.isnan(sigma): missing_params.append("σ")
+if np.isnan(e0):    missing_params.append("e₀")
+if np.isnan(rho):   missing_params.append("ρ")
+if np.isnan(K0):    missing_params.append("K₀")
+if uscs_missing:    missing_params.append("USCS")
+
+if missing_params:
+    st.warning(
+        f"⚠️ Missing inputs: **{', '.join(missing_params)}**. "
+        "The XGBoost model will handle them natively (with potentially increased uncertainty). "
+        "Empirical equations requiring any of these parameters are disabled below."
+    )
 
 # =============================================
 # Display options
@@ -109,21 +152,41 @@ with col_opt1:
 with col_opt2:
     show_model = st.checkbox("Show ML model", value=True)
 
-st.subheader("Empirical equations to compare")
-col_eq1, col_eq2, col_eq3, col_eq4, col_eq5 = st.columns(5)
-kollioglou_checked = col_eq1.checkbox("Kollioglou", value=False)
-ishibashi_checked = col_eq2.checkbox("Ishibashi", value=False)
-vardanega_checked = col_eq3.checkbox("Vardanega", value=False)
-ciancimino_checked = col_eq4.checkbox("Ciancimino", value=False)
-zhang_checked = col_eq5.checkbox("Zhang", value=False)
-
-empirical_equations = {
-    "Kollioglou": kollioglou_checked,
-    "Ishibashi": ishibashi_checked,
-    "Vardanega": vardanega_checked,
-    "Ciancimino": ciancimino_checked,
-    "Zhang": zhang_checked
+# =============================================
+# Empirical equations: dependencies + dynamic enabling
+# =============================================
+empirical_requirements = {
+    "Kollioglou": ["PI"],
+    "Ishibashi": ["PI", "σ"],
+    "Vardanega":  ["PI"],
+    "Ciancimino": ["PI", "σ"],
+    "Zhang":      ["PI", "σ", "K₀"],
 }
+
+param_values = {"PI": PI, "σ": sigma, "K₀": K0}
+
+st.subheader("Empirical equations to compare")
+eq_cols = st.columns(len(empirical_requirements))
+empirical_equations = {}
+
+for (eq_name, required), col in zip(empirical_requirements.items(), eq_cols):
+    missing_for_eq = [p for p in required if np.isnan(param_values[p])]
+    if missing_for_eq:
+        col.checkbox(
+            f"{eq_name}",
+            value=False,
+            disabled=True,
+            help=f"Requires: {', '.join(required)}. Missing: {', '.join(missing_for_eq)}.",
+            key=f"eq_{eq_name}",
+        )
+        empirical_equations[eq_name] = False
+    else:
+        empirical_equations[eq_name] = col.checkbox(
+            f"{eq_name}",
+            value=False,
+            help=f"Requires: {', '.join(required)}.",
+            key=f"eq_{eq_name}",
+        )
 
 # =============================================
 # Computation and plot
@@ -136,10 +199,13 @@ if st.button("Generate curve"):
     results = pd.DataFrame({"log10(gamma)": gamma_log})
 
     if show_model:
-        X = [[PI, USCS_CH, USCS_CH_CL, USCS_CL, USCS_CL_CH,
-              USCS_CL_ML, USCS_MH, USCS_MH_OH, USCS_ML, USCS_ML_OL,
-              W, Wl, Z, e0, np.log10(g), rho, sigma] for g in gammas]
-        X = np.array(X)
+        # Build feature matrix: NaN propagates naturally to XGBoost
+        X = np.array([
+            [PI, USCS_CH, USCS_CH_CL, USCS_CL, USCS_CL_CH,
+             USCS_CL_ML, USCS_MH, USCS_MH_OH, USCS_ML, USCS_ML_OL,
+             W, Wl, Z, e0, np.log10(g), rho, sigma]
+            for g in gammas
+        ], dtype=float)
         y_pred = model.predict(X)
         results["ML_Model"] = y_pred
 
@@ -171,7 +237,6 @@ if st.button("Generate curve"):
                     color=colors[color_idx], linewidth=2, linestyle='--')
             color_idx += 1
 
-
     ax.set_ylim(0, 1)
     ax.set_xlabel("log₁₀(γ) [γ in %]", fontsize=18)
     ax.set_ylabel("G/Gmax", fontsize=18)
@@ -189,6 +254,9 @@ if st.button("Generate curve"):
                        mime="text/csv")
 
     with st.expander("Parameters used"):
-        st.write(f"PI = {PI}, W = {W}, Wl = {Wl}")
-        st.write(f"Z = {Z} m, σ = {sigma} kPa, e₀ = {e0}")
-        st.write(f"ρ = {rho} t/m³, USCS = {selected_uscs}, K₀ = {K0}")
+        def fmt(v): return "not measured" if (isinstance(v, float) and np.isnan(v)) else v
+        st.write(f"PI = {fmt(PI)}, W = {fmt(W)}, Wl = {fmt(Wl)}")
+        st.write(f"Z = {fmt(Z)} m, σ = {fmt(sigma)} kPa, e₀ = {fmt(e0)}")
+        st.write(f"ρ = {fmt(rho)} t/m³, USCS = {'not measured' if uscs_missing else selected_uscs}, K₀ = {fmt(K0)}")
+        if missing_params:
+            st.info(f"Missing inputs handled natively by XGBoost: {', '.join(missing_params)}.")
