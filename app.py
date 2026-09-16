@@ -17,7 +17,7 @@ st.set_page_config(
 # ---------------------------------------------------------------------
 # Files and model domain
 # ---------------------------------------------------------------------
-MODEL_PATH = Path("best_xgb_model.pkl")
+MODEL_PATH = Path("model.pkl")
 LOGO_PATH = Path("logo.jpg")
 
 # Range covered by the held-out dataset used to evaluate the empirical
