@@ -380,7 +380,7 @@ if st.button("Generate curve", type="primary"):
     )
     gamma_log10_pct = np.log10(gamma_pct)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(6, 3))
     results = pd.DataFrame(
         {
             "gamma_percent": gamma_pct,
