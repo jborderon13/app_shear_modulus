@@ -225,10 +225,10 @@ with col4:
 
 n_points = st.slider(
     "Number of strain points",
-    min_value=25,
-    max_value=250,
-    value=100,
-    step=25,
+    min_value=10,
+    max_value=25,
+    value=15,
+    step=1,
 )
 
 uscs_options = [
