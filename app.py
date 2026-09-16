@@ -234,7 +234,7 @@ n_points = st.slider(
     "Number of strain points",
     min_value=10,
     max_value=25,
-    value=15,
+    value=10,
     step=1,
 )
 
