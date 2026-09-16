@@ -38,10 +38,10 @@ OBSERVED_RANGES = {
 }
 
 # Figure rendering settings
-FIG_WIDTH_IN = 6.5       # figure width in inches
-FIG_HEIGHT_IN = 4.0      # figure height in inches
-FIG_DPI = 300            # rendering resolution
-FIG_DISPLAY_WIDTH = 750  # displayed width in pixels
+FIG_WIDTH_IN = 8.5       # figure width in inches
+FIG_HEIGHT_IN = 6.0      # figure height in inches
+FIG_DPI = 400            # rendering resolution
+FIG_DISPLAY_WIDTH = 950  # displayed width in pixels
 
 
 @st.cache_resource
