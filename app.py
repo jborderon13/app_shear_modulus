@@ -1,3 +1,4 @@
+from io import BytesIO
 from pathlib import Path
 
 import joblib
@@ -35,6 +36,12 @@ OBSERVED_RANGES = {
     "ρ": (1.50, 2.23),
     "σ": (40.0, 1100.0),
 }
+
+# Figure rendering settings
+FIG_WIDTH_IN = 6.5       # figure width in inches
+FIG_HEIGHT_IN = 4.0      # figure height in inches
+FIG_DPI = 300            # rendering resolution
+FIG_DISPLAY_WIDTH = 750  # displayed width in pixels
 
 
 @st.cache_resource
@@ -380,7 +387,7 @@ if st.button("Generate curve", type="primary"):
     )
     gamma_log10_pct = np.log10(gamma_pct)
 
-    fig, ax = plt.subplots(figsize=(9, 6))
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH_IN, FIG_HEIGHT_IN))
     results = pd.DataFrame(
         {
             "gamma_percent": gamma_pct,
@@ -424,7 +431,7 @@ if st.button("Generate curve", type="primary"):
             y_pred,
             label="XGBoost model",
             color="#2166AC",
-            linewidth=2.5,
+            linewidth=2.0,
         )
 
         if np.any((y_pred < 0) | (y_pred > 1)):
@@ -446,7 +453,8 @@ if st.button("Generate curve", type="primary"):
                 upper,
                 alpha=0.30,
                 color="#92C5DE",
-                label="Nominal 68% empirical prediction interval",
+                linewidth=0,
+                label="Nominal 68% empirical PI",
             )
 
     empirical_colors = {
@@ -487,22 +495,28 @@ if st.button("Generate curve", type="primary"):
             y_empirical,
             label=equation_name,
             color=empirical_colors[equation_name],
-            linewidth=2,
+            linewidth=1.5,
             linestyle="--",
         )
 
     ax.set_xlim(np.log10(GAMMA_MIN_PCT), np.log10(GAMMA_MAX_PCT))
     ax.set_ylim(0, 1.02)
-    ax.set_xlabel(r"$\log_{10}(\gamma)$, with $\gamma$ in %", fontsize=16)
-    ax.set_ylabel(r"$G/G_{max}$", fontsize=16)
-    ax.set_title("Normalized shear modulus reduction curves", fontsize=17)
-    ax.grid(True, alpha=0.3)
-    ax.tick_params(axis="both", which="major", labelsize=13)
-    ax.legend(bbox_to_anchor=(1.03, 1), loc="upper left", fontsize=11)
+    ax.set_xlabel(r"$\log_{10}(\gamma)$, with $\gamma$ in %", fontsize=11)
+    ax.set_ylabel(r"$G/G_{max}$", fontsize=11)
+    ax.set_title("Normalized shear modulus reduction curves", fontsize=12)
+    ax.grid(True, alpha=0.3, linewidth=0.6)
+    ax.tick_params(axis="both", which="major", labelsize=9)
+    ax.legend(loc="lower left", fontsize=8, framealpha=0.9)
 
-    plt.tight_layout()
-    st.pyplot(fig)
+    fig.tight_layout()
+
+    # High-resolution PNG rendering, displayed at a fixed pixel width
+    png_buffer = BytesIO()
+    fig.savefig(png_buffer, format="png", dpi=FIG_DPI, bbox_inches="tight")
     plt.close(fig)
+    png_bytes = png_buffer.getvalue()
+
+    st.image(png_bytes, width=FIG_DISPLAY_WIDTH)
 
     if show_model and show_interval:
         st.caption(
@@ -513,12 +527,21 @@ if st.button("Generate curve", type="primary"):
             "independent calibration assessment."
         )
 
-    st.download_button(
-        "💾 Download results as CSV",
-        data=results.to_csv(index=False).encode("utf-8"),
-        file_name="ggmax_results.csv",
-        mime="text/csv",
-    )
+    col_dl1, col_dl2, _ = st.columns([1, 1, 3])
+    with col_dl1:
+        st.download_button(
+            "💾 Download results as CSV",
+            data=results.to_csv(index=False).encode("utf-8"),
+            file_name="ggmax_results.csv",
+            mime="text/csv",
+        )
+    with col_dl2:
+        st.download_button(
+            "🖼️ Download figure (PNG)",
+            data=png_bytes,
+            file_name="ggmax_curve.png",
+            mime="image/png",
+        )
 
     with st.expander("Parameters used"):
         def format_value(value):
